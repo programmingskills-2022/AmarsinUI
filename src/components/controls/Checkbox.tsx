@@ -1,4 +1,3 @@
-import React from "react";
 import { FormControl, FormControlLabel, Checkbox as MuiCheckbox } from "@mui/material";
 
 interface CheckboxProps {

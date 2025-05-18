@@ -18,7 +18,7 @@ export function useBrand() {
       };
       console.log("brand params", params);
       const response = await api.get(
-        `/api/Brand/search?accSystem=${params.accSystem}&page=${params.page}&lastId=${params.lastId}&usrPerm=${params.usrPerm}`
+        `/api/Brand/search?accSystem=${params.accSystem}&page=${params.page}&lastId=${params.lastId}&usrPerm=${params.usrPerm}&search=${encodeURI(search?? '')}`
       );
       return response.data;
     },

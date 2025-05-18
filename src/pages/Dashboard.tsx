@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import Employees from "../components/employee/Employees";
-import PageTitle from "../components/PageTitle";
+import PageTitle from "../components/layout/PageTitle";
 import { useBrandStore } from "../store/brandStore";
 import { useAuthStore } from "../store/authStore";
 import { useBrand } from "../hooks/useBrands";
@@ -27,7 +26,7 @@ export default function Dashboard() {
 
       {/* Main content */}
       <main className="flex flex-col items-center justify-center">
-        <Employees />
+        صفحه داشبورد
       </main>
 
       {/* Footer */}

@@ -15,7 +15,7 @@ export default function PageHeader({ title, subTitle, icon }: PageHeaderProps) {
         <Card className="bg-gray-300 p-2 inline-block">{icon}</Card>
         <div className="pl-4 opacity-10">
           <Typography variant="h6" component="div">
-            {title}
+            {title} 
           </Typography>
           <Typography variant="subtitle2" component="div">
             {subTitle}

@@ -16,7 +16,7 @@ const Layout: React.FC<Props> = ({ children }) => {
   const isLoginPage = location.pathname === "/login";
 
   return (
-    <Box className="focus:outline-none select-none" sx={{ display: "flex" }}>
+    <Box className="focus:outline-none select-none" sx={{ display: "flex"}}>
       <CssBaseline />
       {!isLoginPage && (
         <>

@@ -16,7 +16,7 @@ interface SelectProps {
 }
 
 export default function Select(props: SelectProps) {
-  const { name, label, value, error = null, onChange, options } = props;
+  const {  label, value, error = null, onChange, options } = props;
 
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from "react";
 import {
   Table,
   TableHead,
@@ -7,8 +7,17 @@ import {
   TablePagination,
   TableSortLabel,
   useTheme,
-} from '@mui/material';
-import { SxProps } from '@mui/system';
+  IconButton,
+  useMediaQuery,
+} from "@mui/material";
+import {
+  FirstPage,
+  LastPage,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
+} from "@mui/icons-material";
+import { SxProps } from "@mui/system";
+import { convertToFarsiDigits } from "../utilities/general";
 
 type HeadCell<T> = {
   id: keyof T;
@@ -25,53 +34,67 @@ type UseTableReturn<T> = {
   TblHead: React.FC;
   TblPagination: React.FC;
   recordsAfterPagingAndSorting: () => T[];
+  isMobile: boolean;
+  mobileMainColumns: HeadCell<T>[];
+  mobileRestColumns: HeadCell<T>[];
 };
 
 export default function useTable<T>(
   records: T[],
   headCells: HeadCell<T>[],
-  filterFn: FilterFn<T>
+  filterFn: FilterFn<T>,
+  resetPageSignal?: any
 ): UseTableReturn<T> {
-  // Ensure the function returns the expected object
   const theme = useTheme();
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
-  const pages = [5, 10, 25];
+  const mobileMainColumns = headCells.slice(0, 3);
+  const mobileRestColumns = headCells.slice(3);
+
+  const pageNumbers = [5, 10, 25];
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(pages[page]);
-  const [order, setOrder] = useState<'asc' | 'desc' | undefined>();
-  const [orderBy, setOrderBy] = useState<keyof T | ''>('');
+  const [rowsPerPage, setRowsPerPage] = useState<number>(pageNumbers[1]);
+  const pages = pageNumbers.map((num) => ({
+    label: convertToFarsiDigits(num),
+    value: num,
+  }));
+
+  const [order, setOrder] = useState<"asc" | "desc" | undefined>();
+  const [orderBy, setOrderBy] = useState<keyof T | "">("");
+  useEffect(() => {
+    setPage(0);
+  }, [resetPageSignal]);
 
   const tableStyles: SxProps = {
     mt: 3,
-    '& thead th': {
+    "& thead th": {
       fontWeight: 600,
-      color: theme.palette.primary.main,
-      backgroundColor: theme.palette.primary.light,
+      color: theme.palette.grey[600],
+      backgroundColor: theme.palette.grey[300],
     },
-    '& tbody td': {
+    "& tbody td": {
       fontWeight: 300,
     },
-    '& tbody tr:hover': {
-      backgroundColor: '#fffbf2',
-      cursor: 'pointer',
+    "& tbody tr:hover": {
+      backgroundColor: "#fffbf2",
+      cursor: "pointer",
     },
   };
 
   const TblContainer: React.FC<{ children: ReactNode }> = ({ children }) => (
-    <Table sx={tableStyles}>{children}</Table>
+  <Table sx={tableStyles}>{children}</Table>
   );
 
   const TblHead: React.FC = () => {
     const handleSortRequest = (cellId: keyof T) => {
-      const isAsc = orderBy === cellId && order === 'asc';
-      setOrder(isAsc ? 'desc' : 'asc');
+      const isAsc = orderBy === cellId && order === "asc";
+      setOrder(isAsc ? "desc" : "asc");
       setOrderBy(cellId);
     };
-
     return (
       <TableHead>
         <TableRow>
-          {headCells.map((headCell) => (
+          {(isMobile ? mobileMainColumns : headCells).map((headCell) => (
             <TableCell
               key={String(headCell.id)}
               sortDirection={orderBy === headCell.id ? order : false}
@@ -81,7 +104,7 @@ export default function useTable<T>(
               ) : (
                 <TableSortLabel
                   active={orderBy === headCell.id}
-                  direction={orderBy === headCell.id ? order : 'asc'}
+                  direction={orderBy === headCell.id ? order : "asc"}
                   onClick={() => handleSortRequest(headCell.id)}
                 >
                   {headCell.label}
@@ -89,10 +112,52 @@ export default function useTable<T>(
               )}
             </TableCell>
           ))}
+          {isMobile && mobileRestColumns.length > 0 && (
+            <TableCell>جزئیات</TableCell>
+          )}
         </TableRow>
       </TableHead>
     );
   };
+
+  // Custom Pagination Actions
+  function TablePaginationActions(props: any) {
+    const { count, page, rowsPerPage, onPageChange } = props;
+    const lastPage = Math.max(0, Math.ceil(count / rowsPerPage) - 1);
+
+    return (
+      <div style={{ display: "flex" }}>
+        <IconButton
+          onClick={() => onPageChange(null, 0)}
+          disabled={page === 0}
+          aria-label="first page"
+        >
+          <FirstPage />
+        </IconButton>
+        <IconButton
+          onClick={() => onPageChange(null, page - 1)}
+          disabled={page === 0}
+          aria-label="previous page"
+        >
+          <KeyboardArrowLeft />
+        </IconButton>
+        <IconButton
+          onClick={() => onPageChange(null, page + 1)}
+          disabled={page >= lastPage}
+          aria-label="next page"
+        >
+          <KeyboardArrowRight />
+        </IconButton>
+        <IconButton
+          onClick={() => onPageChange(null, lastPage)}
+          disabled={page >= lastPage}
+          aria-label="last page"
+        >
+          <LastPage />
+        </IconButton>
+      </div>
+    );
+  }
 
   const handleChangePage = (_event: unknown, newPage: number): void => {
     setPage(newPage);
@@ -106,32 +171,40 @@ export default function useTable<T>(
   };
 
   const TblPagination: React.FC = () => (
-    <TablePagination
-      component="div"
-      page={page}
-      rowsPerPageOptions={pages}
-      rowsPerPage={rowsPerPage}
-      count={records.length}
-      onPageChange={handleChangePage}
-      onRowsPerPageChange={handleChangeRowsPerPage}
-    />
+    <div dir="rtl" className={isMobile ? "text-xs font-bold" : ""}>
+      <TablePagination
+        component="div"
+        page={page}
+        rowsPerPageOptions={pages}
+        rowsPerPage={rowsPerPage}
+        count={records ? records.length : 0}
+        onPageChange={handleChangePage}
+        ActionsComponent={TablePaginationActions}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage={
+          isMobile ? "تعداد" : "تعداد نمایش داده شده در هر صفحه:"
+        }
+        labelDisplayedRows={({ from, to, count }) =>
+          `${convertToFarsiDigits(from)}-${convertToFarsiDigits(
+            to
+          )} از ${convertToFarsiDigits(count)}`
+        }
+        dir="rtl"
+      />
+    </div>
   );
 
-  const descendingComparator = <T,>(
-    a: T,
-    b: T,
-    orderBy: keyof T
-  ): number => {
+  const descendingComparator = <T,>(a: T, b: T, orderBy: keyof T): number => {
     if (b[orderBy] < a[orderBy]) return -1;
     if (b[orderBy] > a[orderBy]) return 1;
     return 0;
   };
 
   const getComparator = (
-    order: 'asc' | 'desc' | undefined,
+    order: "asc" | "desc" | undefined,
     orderBy: keyof T
   ): ((a: T, b: T) => number) => {
-    return order === 'desc'
+    return order === "desc"
       ? (a, b) => descendingComparator(a, b, orderBy)
       : (a, b) => -descendingComparator(a, b, orderBy);
   };
@@ -152,11 +225,14 @@ export default function useTable<T>(
       (page + 1) * rowsPerPage
     );
   };
-  
+
   return {
     TblContainer,
     TblHead,
     TblPagination,
     recordsAfterPagingAndSorting,
+    isMobile,
+    mobileMainColumns,
+    mobileRestColumns,
   };
 }
