@@ -1,23 +1,17 @@
-//import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from "../../store/authStore";
-//import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { buildTree } from "./treeUtils";
 import { TreeView } from "./TreeView";
 import { MenuItem } from "../../types/menu";
 import { useGeneralContext } from "../../context/GeneralContext";
 import { useEffect, useState } from "react";
+import AutoComplete from "../controls/AutoComplete";
+import { convertToFarsiDigits } from "../../utilities/general";
+import { useDefinitionInvironment } from "../../hooks/useDefinitionInvironment";
 
 const SideMenu = () => {
-  const { isMenuOpened } = useGeneralContext();
-
+  const { isMenuOpened, setChartId } = useGeneralContext();
+  const { definitionInvironment } = useDefinitionInvironment();
   const { authApiResponse, logout } = useAuthStore();
-  // const navigate = useNavigate();
-  // const { logout } = useAuthStore();
-
-  // const handleLogout = () => {
-  //   logout();
-  //   navigate('/login');
-  // };
 
   const userInfo = authApiResponse?.data.result.login;
   const initData = authApiResponse?.data.result.initData;
@@ -25,6 +19,11 @@ const SideMenu = () => {
   const [visible, setVisible] = useState(isMenuOpened);
   const tree = buildTree(menu ?? []);
 
+  const [search, setSearch] = useState<string>("");
+  const [chart, setChart] = useState<{ id: number; title: string } | null>({
+    id: initData?.chartId ?? 0,
+    title: convertToFarsiDigits(initData?.chartTitle) ?? "",
+  });
   // Delay unmounting inner content for smooth transition
   useEffect(() => {
     if (isMenuOpened) {
@@ -36,8 +35,15 @@ const SideMenu = () => {
   }, [isMenuOpened]);
 
   const openLogin = () => {
+    console.log(search);
     logout();
   };
+
+  useEffect(() => {
+    if (chart?.id !== undefined && chart.id !== 0) {
+      setChartId(Number(chart.id));
+    }
+  }, [chart]);
 
   return (
     <aside
@@ -51,16 +57,38 @@ const SideMenu = () => {
           isMenuOpened ? "opacity-100" : "opacity-0"
         } ${visible ? "block" : "hidden"}`}
       >
-        {/* User Info */}
-        <div
-          className="flex items-center justify-center border-y-2 p-2 hover:cursor-pointer"
-          onClick={openLogin}
-        >
-          {userInfo?.nam || "کاربر سیستم"}
-        </div>
-        {/* سمت */}
-        <div className="flex items-center justify-center p-2 hover:cursor-pointer">
-          {initData?.chartTitle || "..."}
+        <div className="flex flex-col w-full items-center justify-center">
+          {/* User Info */}
+          <div
+            className="w-full flex items-center justify-center border-y-2 p-2 hover:cursor-pointer"
+            onClick={openLogin}
+          >
+            {userInfo?.nam || "کاربر سیستم"}
+          </div>
+          {/* سمت */}
+          <div className="flex justify-center items-center w-52 ">
+            <AutoComplete
+              options={
+                definitionInvironment?.charts !== undefined
+                  ? definitionInvironment?.charts.map((b) => ({
+                      id: b.id,
+                      title: b.name,
+                    }))
+                  : []
+              }
+              value={chart}
+              handleChange={(_event, newValue) => {
+                return setChart(newValue);
+              }}
+              setSearch={setSearch}
+              desktopfontsize="0.8rem"
+              className="w-2/3 pt-4 md:pt-0 md:w-1/5"
+              showLabel={false}
+              showBorder={false}
+              showClearIcon={false}
+              inputPadding="0 !important"
+            />
+          </div>
         </div>
 
         {/* Menu Header */}

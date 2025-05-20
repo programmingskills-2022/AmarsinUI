@@ -25,8 +25,6 @@ export const useAuthStore = create<AuthState>()(
       setField: (field, value) => set((state) => ({ ...state, [field]: value })),
       setToken: (token) => set({ token, isAuthenticated: true }),
       setError: (errorCode,message)=>set({errorCode,message}),
-      // setUserInfo: (userInfo) => set({ userInfo }),
-      // setAppConfig: (appConfig) => set({ appConfig }),
       logout: () => set({
         userName: '',
         pass: '',
@@ -42,8 +40,6 @@ export const useAuthStore = create<AuthState>()(
         authApiResponse:null,
         errorCode:-1,
         message:''
-        // userInfo: null,
-        // appConfig: null,
       }),
     }),
     { name: 'auth-storage' }

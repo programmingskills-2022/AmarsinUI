@@ -5,11 +5,12 @@ import LoginRight from "../components/login/LoginRight";
 import { useGeneralContext } from "../context/GeneralContext";
 import LoginLeft from "../components/login/LoginLeft";
 
+
 type Props = {
   isHomePage: boolean;
 };
 export default function Login({ isHomePage }: Props) {
-  const {setIsMenuOpened}= useGeneralContext()
+  const { setIsMenuOpened } = useGeneralContext();
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [activationCode, setActivationCode] = useState<string>("");
   const [errorPage, setErrorPage] = useState<string>("");
@@ -28,19 +29,23 @@ export default function Login({ isHomePage }: Props) {
     setShowCodeModal(false);
   };
 
-  useEffect(()=>{
-    console.log(errorPage)
-    setIsMenuOpened(true)
-  },[])
+  useEffect(() => {
+    console.log(errorPage);
+    setIsMenuOpened(true);
+
+  }, []);
 
   return (
-    <div className="w-full h-screen flex justify-center overflow-hidden" dir="rtl">
+    <div
+      className="w-full h-screen flex justify-center overflow-hidden"
+      dir="rtl"
+    >
       {/* Right: Login card (now first for RTL) */}
       <LoginRight
         activationCode={activationCode}
         setActivationCode={setActivationCode}
         setShowCodeModal={setShowCodeModal}
-        isHomePage ={isHomePage}
+        isHomePage={isHomePage}
       />
       {/* Left: Background image and logo */}
       {isHomePage && <LoginLeft />}

@@ -4,6 +4,7 @@ import logoAvatar from "../../assets/images/logo-Avatar.png";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useAuthStore } from "../../store/authStore";
+import { useGeneralContext } from "../../context/GeneralContext";
 
 type Props = {
   activationCode: string;
@@ -20,10 +21,12 @@ const LoginRight = ({
   const [errorPage, setErrorPage] = useState<string>("");
   const [remember, setRemember] = useState(false);
   const { login, isLoading } = useAuth();
-  const { userName, pass, setField, message, errorCode, xCustomerCode } =
+  const { userName, pass, setField, message, errorCode, xCustomerCode, authApiResponse } =
     useAuthStore();
+  const {setSystemId,setYearId,setChartId}=useGeneralContext()
 
   const submitButtonRef = useRef<HTMLButtonElement>(null); // Create a ref for the button
+  const initData=authApiResponse?.data.result.initData
 
   useEffect(() => {
     // Set focus on the submit button when the component mounts
@@ -46,7 +49,20 @@ const LoginRight = ({
       setErrorPage("لطفا کد فعال‌ساز را وارد کنید");
       return;
     }
-    login();
+    try {
+      login();
+
+      setSystemId(initData?.systemId?? 0)
+      setYearId(initData?.yearId?? 0)
+      setChartId(initData?.chartId?? 0)
+      
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log(error);
+      }
+    }
   };
 
   return (

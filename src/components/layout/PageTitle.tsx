@@ -1,33 +1,93 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../../store/authStore";
-import { useBrandStore } from "../../store/brandStore";
 import { convertToFarsiDigits } from "../../utilities/general";
-import { useBrand } from "../../hooks/useBrands";
+import AutoComplete from "../controls/AutoComplete";
+import { useGeneralContext } from "../../context/GeneralContext";
+import { useDefinitionInvironment } from "../../hooks/useDefinitionInvironment";
 
 const PageTitle = () => {
+  const { setSystemId, setYearId } = useGeneralContext();
   const { authApiResponse } = useAuthStore();
   const initData = authApiResponse?.data.result.initData;
-  const { brands } = useBrandStore();
-  const { getBrands } = useBrand();
+  const { definitionInvironment } = useDefinitionInvironment();
+
+  const [search, setSearch] = useState<string>("");
+  const [system, setSystem] = useState<{ id: number; title: string } | null>({
+    id: initData?.systemId ?? 0,
+    title: convertToFarsiDigits(initData?.systemTitle) ?? "",
+  });
+  const [year, setYear] = useState<{ id: number; title: string } | null>({
+    id: initData?.yearId ?? 0,
+    title: convertToFarsiDigits(initData?.yearTitle) ?? "",
+  });
 
   useEffect(() => {
-    getBrands();
+    console.log(search);
   }, []);
 
-  console.log(brands)
+  useEffect(() => {
+    if (year?.id !== undefined && year.id !== 0) {
+      setYearId(Number(year.id));
+    }
+  }, [year]);
+
+  useEffect(() => {
+    if (system?.id !== undefined && system.id !== 0) {
+      setSystemId(Number(system.id));
+    }
+  }, [system]);
+
   return (
-    <div className="flex text-xs sm:text-sm px-2">
-      <div className="flex flex-col justify-end items-end">
-        <div>سیستم:</div>
-        <div className="whitespace-nowrap">سال مالی:</div>
+    <div className="flex justify-center w-80 items-start md:flex-row text-xs sm:text-sm px-4 gap-2">
+      <div className="flex flex-col justify-evenly items-end text-center w-20">
+        <label htmlFor="year" className="">
+          سال مالی:
+        </label>
+        <label htmlFor="system">سیستم:</label>
       </div>
-      <div className="flex flex-col items-start justify-center font-semibold px-2">
-        <div>
-          {initData?.systemTitle}
-        </div>
-        <div>{convertToFarsiDigits(initData?.yearTitle)}</div>
+      <div className="flex flex-col justify-center items-end w-60">
+        <AutoComplete
+          options={
+            definitionInvironment?.years !== undefined
+              ? definitionInvironment?.years.map((b) => ({
+                  id: b.id,
+                  title: convertToFarsiDigits(b.code),
+                }))
+              : []
+          }
+          value={year}
+          handleChange={(_event, newValue) => {
+            return setYear(newValue);
+          }}
+          setSearch={setSearch}
+          desktopfontsize="0.8rem"
+          className="w-2/3 pt-4 md:pt-0 md:w-1/5"
+          showLabel={false}
+          showBorder={false}
+          showClearIcon={false}
+          outlinedInputPadding="0"
+          inputPadding="0 !important"
+          showBold={true}
+        />
+        <AutoComplete
+          options={definitionInvironment?.systems ?? []}
+          value={system}
+          handleChange={(_event, newValue) => {
+            return setSystem(newValue);
+          }}
+          setSearch={setSearch}
+          desktopfontsize="0.8rem"
+          className="w-2/3 md:w-1/5"
+          showLabel={false}
+          showBorder={false}
+          showClearIcon={false}
+          outlinedInputPadding="0"
+          inputPadding="0 !important"
+          showBold={true}
+        />
       </div>
     </div>
   );
 };
+
 export default PageTitle;

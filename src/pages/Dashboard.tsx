@@ -2,18 +2,15 @@ import { useEffect } from "react";
 import PageTitle from "../components/layout/PageTitle";
 import { useBrandStore } from "../store/brandStore";
 import { useAuthStore } from "../store/authStore";
-import { useBrand } from "../hooks/useBrands";
 
 export default function Dashboard() {
 
-  const {getBrands} = useBrand()
   const {setField} = useBrandStore()
   const {authApiResponse}=useAuthStore()
 
   const accSystem= authApiResponse?.data.result.initData.systemId
   useEffect(()=>{
     setField("accSystem",accSystem)
-    getBrands()
   },[accSystem])
 
   return (

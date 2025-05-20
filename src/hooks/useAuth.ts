@@ -34,7 +34,6 @@ export function useAuth() {
         menu,
         initData
       }
-      console.log('login info', body)
       const response = await api.post('/api/User/login', body)
       return response.data
     },
@@ -57,7 +56,6 @@ export function useAuth() {
       localStorage.setItem('token', responseData?.result?.login.token)
       setAuthApiResponse(data)
 
-      console.log('dshjdhsjdhj')
       navigate('/dashboard')
     },
     onError: (error) => {
