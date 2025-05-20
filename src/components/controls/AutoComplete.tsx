@@ -24,8 +24,8 @@ const AutoComplete = <T extends { id: string | number; title: string }>({
   value,
   handleChange,
   setSearch,
-  mobilefontsize = "0.875rem",
-  desktopfontsize = "1rem",
+  mobilefontsize = "0.7rem",
+  desktopfontsize = "0.875rem",
   showLabel = true,
   showBorder = true,
   showClearIcon = true,
@@ -40,7 +40,7 @@ const AutoComplete = <T extends { id: string | number; title: string }>({
       clearIcon={showClearIcon ? undefined : <span />}
       popupIcon={showPopupIcon ? undefined : <span />}
       renderOption={(props, option) => (
-        <li {...props} className="text-sm p-2" key={option.id}>
+        <li {...props} className="text-xs md:text-sm p-2" key={option.id}>
           {option.title}
         </li>
       )}

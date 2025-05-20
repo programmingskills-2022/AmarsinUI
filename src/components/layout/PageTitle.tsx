@@ -38,8 +38,8 @@ const PageTitle = () => {
   }, [system]);
 
   return (
-    <div className="flex justify-center w-80 items-start md:flex-row text-xs sm:text-sm px-4 gap-2">
-      <div className="flex flex-col justify-evenly items-end text-center w-20">
+    <div className="flex justify-center w-80 items-start md:flex-row px-4 gap-2 text-xs md:text-sm">
+      <div className="flex flex-col justify-evenly items-end text-center  w-20">
         <label htmlFor="year" className="">
           سال مالی:
         </label>
@@ -60,7 +60,6 @@ const PageTitle = () => {
             return setYear(newValue);
           }}
           setSearch={setSearch}
-          desktopfontsize="0.8rem"
           className="w-2/3 pt-4 md:pt-0 md:w-1/5"
           showLabel={false}
           showBorder={false}
@@ -76,7 +75,6 @@ const PageTitle = () => {
             return setSystem(newValue);
           }}
           setSearch={setSearch}
-          desktopfontsize="0.8rem"
           className="w-2/3 md:w-1/5"
           showLabel={false}
           showBorder={false}
