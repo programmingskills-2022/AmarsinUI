@@ -16,6 +16,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>

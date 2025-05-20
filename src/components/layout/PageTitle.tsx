@@ -40,12 +40,29 @@ const PageTitle = () => {
   return (
     <div className="flex justify-center w-80 items-start md:flex-row px-4 gap-2 text-xs md:text-sm">
       <div className="flex flex-col justify-evenly items-end text-center  w-20">
+        <label htmlFor="system">سیستم:</label>
         <label htmlFor="year" className="">
           سال مالی:
         </label>
-        <label htmlFor="system">سیستم:</label>
       </div>
       <div className="flex flex-col justify-center items-end w-60">
+        {/* for system */}
+        <AutoComplete
+          options={definitionInvironment?.systems ?? []}
+          value={system}
+          handleChange={(_event, newValue) => {
+            return setSystem(newValue);
+          }}
+          setSearch={setSearch}
+          className="w-2/3 md:w-1/5"
+          showLabel={false}
+          showBorder={false}
+          showClearIcon={false}
+          outlinedInputPadding="0"
+          inputPadding="0 !important"
+          showBold={true}
+        />
+        {/* for year */}
         <AutoComplete
           options={
             definitionInvironment?.years !== undefined
@@ -68,21 +85,7 @@ const PageTitle = () => {
           inputPadding="0 !important"
           showBold={true}
         />
-        <AutoComplete
-          options={definitionInvironment?.systems ?? []}
-          value={system}
-          handleChange={(_event, newValue) => {
-            return setSystem(newValue);
-          }}
-          setSearch={setSearch}
-          className="w-2/3 md:w-1/5"
-          showLabel={false}
-          showBorder={false}
-          showClearIcon={false}
-          outlinedInputPadding="0"
-          inputPadding="0 !important"
-          showBold={true}
-        />
+
       </div>
     </div>
   );
