@@ -19,6 +19,8 @@ const ToolBar = () => {
     setIsMenuOpened(!isMenuOpened);
   };
 
+
+
   return (
     <Toolbar className="text-gray-600 flex justify-between">
       <div className="flex">

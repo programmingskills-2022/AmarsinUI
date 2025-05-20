@@ -23,3 +23,19 @@ export const convertStringToInteger=(str:string)=> {
     return isNaN(result) ? null : result; // Return null for NaN  
 }  
 
+export function formatPersianDate(curDay: number, curMonth: number, curYear: number): string {
+    const persianDays = [
+      "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"
+    ];
+    const persianMonths = [
+      "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+      "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
+    ];
+  
+    // curDay: 0 (یکشنبه) to 6 (شنبه)
+    // curMonth: 1 (فروردین) to 12 (اسفند)
+    const dayName = persianDays[curDay % 7];
+    const monthName = persianMonths[(curMonth - 1) % 12];
+  
+    return convertToFarsiDigits(`${dayName}، ${curDay} ${monthName} ${curYear}`);
+  }

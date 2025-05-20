@@ -5,10 +5,12 @@ import { MenuItem } from "../../types/menu";
 import { useGeneralContext } from "../../context/GeneralContext";
 import { useEffect, useState } from "react";
 import AutoComplete from "../controls/AutoComplete";
-import { convertToFarsiDigits } from "../../utilities/general";
+import { convertToFarsiDigits, formatPersianDate } from "../../utilities/general";
 import { useDefinitionInvironment } from "../../hooks/useDefinitionInvironment";
+import { colors } from "../../utilities/color";
 
 const SideMenu = () => {
+
   const { isMenuOpened, setChartId } = useGeneralContext();
   const { definitionInvironment } = useDefinitionInvironment();
   const { authApiResponse, logout } = useAuthStore();
@@ -45,6 +47,13 @@ const SideMenu = () => {
     }
   }, [chart]);
 
+
+  const formatted = formatPersianDate(
+    definitionInvironment.curDay,
+    definitionInvironment.curMonth,
+    definitionInvironment.curYear
+  );
+
   return (
     <aside
       className={`bg-white sm:h-[calc(100vh-72px)] sm:overflow-y-auto text-gray-600 text-sm flex flex-col transition-all duration-300 ${
@@ -60,7 +69,16 @@ const SideMenu = () => {
         <div className="flex flex-col w-full items-center justify-center">
           {/* User Info */}
           <div
-            className="w-full flex items-center justify-center border-y-2 p-2 hover:cursor-pointer"
+            className={`${colors.cyan} w-full flex items-center justify-center border-b-2 p-2 hover:cursor-pointer`}
+            onClick={openLogin}
+          >
+            <label className=" text-white px-3 py-1 rounded">
+              {formatted}
+            </label>
+          </div>
+          {/* User Info */}
+          <div
+            className="w-full flex items-center justify-center border-b-2 p-2 hover:cursor-pointer"
             onClick={openLogin}
           >
             {userInfo?.nam || "کاربر سیستم"}
@@ -92,7 +110,7 @@ const SideMenu = () => {
         </div>
 
         {/* Menu Header */}
-        <h2 className="text-lg font-bold bg-cyan-600 text-gray-50 py-2 px-4">
+        <h2 className={`${colors.cyan} text-lg font-bold text-gray-50 py-2 px-4`}>
           منوی نرم افزار
         </h2>
       </div>
