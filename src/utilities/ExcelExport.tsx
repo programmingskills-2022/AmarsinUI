@@ -1,6 +1,8 @@
 import * as XLSX from "xlsx";
 import { HeadCell } from "../components/inventory/InventoryListForm";
 import ExcelIcon from "../assets/images/GrayThem/excel24.png";
+import Modal from "../components/layout/Modal";
+import { useState, useEffect } from "react";
 
 interface ExportToExcelProps<T> {
   headCells: HeadCell<T>[];
@@ -12,9 +14,28 @@ const ExcelExport = <T extends object>({
   headCells,
 }: ExportToExcelProps<T>) => {
   const fileName = "data_export.xlsx";
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(data);
+  useEffect(() => {
+    let timeoutId: number;
+    if (isModalOpen) {
+      timeoutId = setTimeout(() => {
+        setIsModalOpen(false);
+      }, 3000);
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isModalOpen]);
 
   const handleExport = () => {
-    // Only export columns defined in headCells, with Farsi headers
+    
+    if (!data || data.length === 0) {
+      setIsModalOpen(true);
+      return;
+    }
     const exportData = data.map((item) => {
       const row: Record<string, any> = {};
       headCells.forEach((cell) => {
@@ -30,11 +51,18 @@ const ExcelExport = <T extends object>({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center  cursor-pointer px-4"
-    onClick={handleExport}>
-      <img src={ExcelIcon} />
-      <p className="text-xs">اکسل</p>
-    </div>
+    <>
+      <div className="flex flex-col items-center justify-center  cursor-pointer px-4"
+      onClick={handleExport}>
+        <img src={ExcelIcon} />
+        <p className="text-xs">اکسل</p>
+      </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message="اطلاعاتی برای انتقال به اکسل وجود ندارد."
+      />
+    </>
   );
 };
 

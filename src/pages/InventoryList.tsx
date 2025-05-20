@@ -1,14 +1,14 @@
 import PageTitle from "../components/layout/PageTitle";
 import InventoryListForm, { headCells } from "../components/inventory/InventoryListForm";
 import ExcelExport from "../utilities/ExcelExport";
-import { useInventoryStore } from "../store/inventoryStore";
 import { useBrandStore } from "../store/brandStore";
 import { useEffect } from "react";
 import { useGeneralContext } from "../context/GeneralContext";
+import { useInventory } from "../hooks/useInventory";
 
 export default function InventoryList() {
 
-  const {inventoryList} = useInventoryStore()
+  const {inventoryList} = useInventory()
   const {setField}=useBrandStore()
   const {systemId}=useGeneralContext()
 
