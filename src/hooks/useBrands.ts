@@ -21,7 +21,8 @@ export function useBrand() {
         usrPerm,
         search,
       };
-
+      console.log('come to useBrand')
+      console.log("brand parameters:",params)
       const response = await api.get(
         `/api/Brand/search?accSystem=${params.accSystem}&page=${params.page}&lastId=${params.lastId}&usrPerm=${params.usrPerm}&search=${encodeURIComponent(search ?? "")}`
       );

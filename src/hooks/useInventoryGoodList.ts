@@ -1,15 +1,15 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import api from "../api/axios";
 import { useInventoryStore } from "../store/inventoryStore";
-import { InventoryList, InventoryListRequest } from "../types/inventory";
+import { InventoryList, InventoryGoodListRequest } from "../types/inventory";
 
-export function useInventory() {
+export function useInventoryGoodList() {
   const { accSystem, accYear, brandId, setInventoryList } = useInventoryStore();
 
   const query = useQuery<InventoryList, Error, InventoryList, unknown[]>({
     queryKey: ["inventoryList", accSystem, accYear, brandId],
     queryFn: async () => {
-      const params: InventoryListRequest = {
+      const params: InventoryGoodListRequest = {
         accSystem,
         accYear,
         brandId,

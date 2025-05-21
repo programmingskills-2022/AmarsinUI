@@ -6,7 +6,9 @@ import { useAuthStore } from './store/authStore'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Layout from './components/layout/Layout'
 import User from './pages/User'
-import InventoryList from './pages/InventoryList'
+import InventoryGoodList from './pages/reports/InventoryGoodList'
+import InventoryList from './pages/reports/InventoryList'
+
 
 const queryClient = new QueryClient()
 
@@ -41,6 +43,14 @@ function App() {
             />
             <Route
               path="/admin/RpProviders/Inventory"
+              element={
+                <PrivateRoute>
+                  <InventoryGoodList />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/RpProviders"
               element={
                 <PrivateRoute>
                   <InventoryList />

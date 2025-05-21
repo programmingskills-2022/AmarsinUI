@@ -1,32 +1,43 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface GeneralContextProps {
   isMenuOpened: boolean;
   setIsMenuOpened: (value: boolean) => void;
   treeNodeTitle: string;
-  setTreeNodeTitle: (value:string) => void;
-  yearId:number
-  setYearId:(value:number) => void;
-  systemId:number
-  setSystemId:(value:number) => void;
-  chartId:number
-  setChartId:(value:number) => void;
+  setTreeNodeTitle: (value: string) => void;
+  yearId: number;
+  setYearId: (value: number) => void;
+  systemId: number;
+  setSystemId: (value: number) => void;
+  chartId: number;
+  setChartId: (value: number) => void;
 }
 
 const GeneralContext = createContext<GeneralContextProps | undefined>(undefined);
 
+const getInitial = <T,>(key: string, defaultValue: T): T => {
+  const saved = localStorage.getItem(key);
+  return saved !== null ? JSON.parse(saved) : defaultValue;
+};
+
 export const GeneralProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isMenuOpened, setIsMenuOpened] = useState<boolean>(true); 
-  const [yearId, setYearId] = useState<number>(0); 
-  const [systemId, setSystemId] = useState<number>(0); 
-  const [chartId, setChartId] = useState<number>(0); 
-  const [treeNodeTitle, setTreeNodeTitle] = useState<string>(''); 
+  const [isMenuOpened, setIsMenuOpened] = useState<boolean>(() => getInitial("isMenuOpened", true));
+  const [treeNodeTitle, setTreeNodeTitle] = useState<string>(() => getInitial("treeNodeTitle", ""));
+  const [yearId, setYearId] = useState<number>(() => getInitial("yearId", 0));
+  const [systemId, setSystemId] = useState<number>(() => getInitial("systemId", 0));
+  const [chartId, setChartId] = useState<number>(() => getInitial("chartId", 0));
+
+  useEffect(() => { localStorage.setItem("isMenuOpened", JSON.stringify(isMenuOpened)); }, [isMenuOpened]);
+  useEffect(() => { localStorage.setItem("treeNodeTitle", JSON.stringify(treeNodeTitle)); }, [treeNodeTitle]);
+  useEffect(() => { localStorage.setItem("yearId", JSON.stringify(yearId)); }, [yearId]);
+  useEffect(() => { localStorage.setItem("systemId", JSON.stringify(systemId)); }, [systemId]);
+  useEffect(() => { localStorage.setItem("chartId", JSON.stringify(chartId)); }, [chartId]);
 
   return (
     <GeneralContext.Provider
-    value={{
+      value={{
         isMenuOpened,
-        setIsMenuOpened, 
+        setIsMenuOpened,
         treeNodeTitle,
         setTreeNodeTitle,
         yearId,
@@ -34,7 +45,7 @@ export const GeneralProvider: React.FC<{ children: ReactNode }> = ({ children })
         systemId,
         setSystemId,
         chartId,
-        setChartId
+        setChartId,
       }}
     >
       {children}

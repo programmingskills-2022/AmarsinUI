@@ -1,14 +1,15 @@
-import PageTitle from "../components/layout/PageTitle";
-import InventoryListForm, { headCells } from "../components/inventory/InventoryListForm";
-import ExcelExport from "../utilities/ExcelExport";
-import { useBrandStore } from "../store/brandStore";
+import PageTitle from "../../components/layout/PageTitle";
+import   { headCells } from "../../components/inventory/InventoryGoodListForm";
+import ExcelExport from "../../utilities/ExcelExport";
+import { useBrandStore } from "../../store/brandStore";
 import { useEffect } from "react";
-import { useGeneralContext } from "../context/GeneralContext";
-import { useInventory } from "../hooks/useInventory";
+import { useGeneralContext } from "../../context/GeneralContext";
+import { useInventoryGoodList } from "../../hooks/useInventoryGoodList";
+import InventoryListForm from "../../components/inventory/InventoryListForm";
 
 export default function InventoryList() {
 
-  const {inventoryList} = useInventory()
+  const {inventoryList} = useInventoryGoodList()
   const {setField}=useBrandStore()
   const {systemId}=useGeneralContext()
 

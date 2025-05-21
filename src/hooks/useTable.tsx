@@ -19,10 +19,16 @@ import {
 import { SxProps } from "@mui/system";
 import { convertToFarsiDigits } from "../utilities/general";
 
-type HeadCell<T> = {
-  id: keyof T;
+export type HeadCell<T> = {
+  id: keyof T | "index";
   label: string;
   disableSorting?: boolean;
+  isNumber?: boolean;
+};
+
+export type HeaderGroup = {
+  label: string;
+  colSpan: number;
 };
 
 type FilterFn<T> = {
@@ -42,6 +48,7 @@ type UseTableReturn<T> = {
 export default function useTable<T>(
   records: T[],
   headCells: HeadCell<T>[],
+  headerGroups: HeaderGroup[],
   filterFn: FilterFn<T>,
   resetPageSignal?: any
 ): UseTableReturn<T> {
@@ -82,7 +89,7 @@ export default function useTable<T>(
   };
 
   const TblContainer: React.FC<{ children: ReactNode }> = ({ children }) => (
-  <Table sx={tableStyles}>{children}</Table>
+    <Table sx={tableStyles}>{children}</Table>
   );
 
   const TblHead: React.FC = () => {
@@ -93,10 +100,26 @@ export default function useTable<T>(
     };
     return (
       <TableHead>
+        {!isMobile && headerGroups.length > 0 && (
+          <TableRow>
+            {headerGroups.map((group, idx) => (
+              <TableCell
+                key={idx}
+                colSpan={group.colSpan}
+                align="center"
+                style={{ fontWeight: "bold" }}
+                sx={{ padding: "4px 8px", borderBottom: "1px solid lightgray" }} // Adjust as needed
+              >
+                {group.label}
+              </TableCell>
+            ))}
+          </TableRow>
+        )}
         <TableRow>
           {(isMobile ? mobileMainColumns : headCells).map((headCell) => (
             <TableCell
               key={String(headCell.id)}
+              sx={{ padding: "4px 8px" }} // Adjust as needed
               sortDirection={orderBy === headCell.id ? order : false}
             >
               {headCell.disableSorting ? (
@@ -105,7 +128,7 @@ export default function useTable<T>(
                 <TableSortLabel
                   active={orderBy === headCell.id}
                   direction={orderBy === headCell.id ? order : "asc"}
-                  onClick={() => handleSortRequest(headCell.id)}
+                  onClick={() => handleSortRequest(headCell.id as keyof T)}
                 >
                   {headCell.label}
                 </TableSortLabel>

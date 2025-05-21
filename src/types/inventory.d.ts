@@ -16,16 +16,16 @@ export interface InventoryList {
   rpProviderInventories: InventoryItem[];
 }
 
-export interface InventoryListRequest {
+export interface InventoryGoodListRequest {
   accSystem: number;
   accYear: number;
   brandId: number;
 }
 
 
-export interface InventoryState extends InventoryListRequest{
+export interface InventoryState extends InventoryGoodListRequest{
     inventoryList:InventoryList
-    setField: (field: keyof InventoryListRequest, value: any) => void;
+    setField: (field: keyof InventoryGoodListRequest, value: any) => void;
     setInventoryList:(inventoryList:InventoryList) =>void
     
 }

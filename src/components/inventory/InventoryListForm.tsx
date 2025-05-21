@@ -4,53 +4,93 @@ import { Paper } from "@mui/material";
 import { useBrandStore } from "../../store/brandStore";
 import { useInventoryStore } from "../../store/inventoryStore";
 import { InventoryItem } from "../../types/inventory";
-import { useInventory } from "../../hooks/useInventory";
+import { useInventoryGoodList } from "../../hooks/useInventoryGoodList";
 import { useBrand } from "../../hooks/useBrands";
 import Skeleton from "../layout/Skeleton";
 import { useNavigate } from "react-router-dom";
 import AutoComplete from "../controls/AutoComplete";
 import { Table } from "../controls/Table";
 import { useGeneralContext } from "../../context/GeneralContext";
+import PersianDatePicker from "../controls/DatePicker";
+import Checkbox from "../controls/Checkbox";
+import { HeadCell, HeaderGroup } from "../../hooks/useTable";
 
-export type HeadCell<T> = {
-  id: keyof T;
-  label: string;
-  disableSorting?: boolean;
-  isNumber?: boolean;
-};
 
 export const headCells: HeadCell<InventoryItem>[] = [
   {
-    id: "id",
-    label: "شناسه برند",
+    id: "index",
+    label: "ردیف",
     disableSorting: true,
   },
-  { id: "bn", label: "برند" },
   { id: "fn", label: "نام کالا" },
-  { id: "s", label: "قابل فروش", isNumber: true },
-  { id: "ns", label: "غیر قابل فروش", isNumber: true },
-  { id: "c", label: "بچ", isNumber: true },
-  { id: "uid", label: "UID", isNumber: true },
-  { id: "gtin", label: "GTIN", isNumber: true },
-  { id: "ed", label: "انقضاء", isNumber: true },
+  { id: "s", label: "تعداد", isNumber: true },
+  { id: "ns", label: "مبلغ", isNumber: true },
+  { id: "c", label: "تعداد", isNumber: true },
+];
+
+const headerGroups: HeaderGroup[] = [
+  { label: "", colSpan: 1 },
+  { label: "", colSpan: 1 },
+  { label: "ریالی", colSpan: 2 },
+  { label: "آفر", colSpan: 1 },
+
 ];
 
 export default function InventoryListForm() {
-  const { inventoryList, error, isLoading } = useInventory();
+  const { inventoryList, error, isLoading } = useInventoryGoodList();
 
   const { systemId, yearId } = useGeneralContext();
 
   const [search, setSearch] = useState<string>("");
+
+  //set params
   const [brand, setBrand] = useState<{ id: string; title: string } | null>({
     id: "0",
     title: "",
   });
+  const [selectedType, setSelectedType] = useState<{
+    id: string;
+    title: string;
+  } | null>({
+    id: "0",
+    title: "",
+  });
+  const type = [
+    { id: "0", title: "فروش" },
+    { id: "1", title: "برگشت از فروش" },
+  ];
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [hasDate, setHasDate] = useState<boolean>(false);
 
   const { setField: setBrandField } = useBrandStore();
-  const { brands } = useBrand();
   const { setField } = useInventoryStore();
   //if error occurred then navigate to login page
   const navigate = useNavigate();
+
+  const handleDateChange = (event: {
+    target: { name: string; value: Date | null };
+  }) => {
+    if (event.target.name === "startDate") {
+      setStartDate(event.target.value);
+    } else {
+      setEndDate(event.target.value);
+    }
+  };
+
+  const handleCheckboxChange = (event: {
+    target: { name: string; value: boolean };
+  }) => {
+    if (event.target.value === true) {
+      setStartDate(new Date());
+      setEndDate(new Date());
+    } else {
+      setStartDate(null);
+      setEndDate(null);
+    }
+    setHasDate(event.target.value);
+  };
 
   useEffect(() => {
     if (error) {
@@ -60,39 +100,80 @@ export default function InventoryListForm() {
   }, [error, navigate]);
 
   useEffect(() => {
+    setBrandField("accSystem", systemId);
     setBrandField("search", search);
-    //getBrands();
   }, [search, systemId]);
+  const { brands } = useBrand();
 
   useEffect(() => {
     setField("accSystem", systemId);
     setField("accYear", yearId);
     setField("brandId", brand === null || !brand ? 0 : brand.id);
-    //getInventoryList();
   }, [systemId, yearId, brand?.id]);
 
   if (error) return <div>Error: {error.message} </div>;
 
   return (
-    <>
       <Paper className="p-2 m-2 w-full">
-        <div className="flex md:w-1/4 justify-center items-center gap-2">
-          <label htmlFor="year" className="">
-            برند:
-          </label>
-          <AutoComplete
-            options={brands.map((b) => ({
-              id: b.id,
-              title: b.text,
-            }))}
-            value={brand}
-            handleChange={(_event, newValue) => {
-              return setBrand(newValue);
-            }}
-            setSearch={setSearch}
-            showLabel={false}
-            inputPadding="0 !important"
-          />
+        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2">
+          <div className="md:w-1/3 w-full flex items-center gap-2">
+            <Checkbox
+              name="DateCheckbox"
+              onChange={handleCheckboxChange}
+              value={hasDate}
+              label="تاریخ:"
+            />
+            <PersianDatePicker
+              name="startDate"
+              label="از:"
+              value={startDate}
+              onChange={handleDateChange}
+              disabled={!hasDate}
+            />
+            <label className="text-sm md:text-base">
+              تا:
+            </label>
+            <PersianDatePicker
+              name="endDate"
+              label="تا:"
+              value={endDate}
+              onChange={handleDateChange}
+              disabled={!hasDate}
+            />
+          </div>
+          <div className="md:w-1/3 w-full flex items-center gap-2">
+            <label htmlFor="type" className="">
+              نوع:
+            </label>
+            <AutoComplete
+              options={type}
+              value={selectedType}
+              handleChange={(_event, newValue) => {
+                return setSelectedType(newValue);
+              }}
+              setSearch={setSearch}
+              showLabel={false}
+              inputPadding="0 !important"
+            />
+          </div>
+          <div className="md:w-1/3 w-full flex items-center gap-2">
+            <label htmlFor="brand" className="">
+              برند:
+            </label>
+            <AutoComplete
+              options={brands.map((b) => ({
+                id: b.id,
+                title: b.text,
+              }))}
+              value={brand}
+              handleChange={(_event, newValue) => {
+                return setBrand(newValue);
+              }}
+              setSearch={setSearch}
+              showLabel={false}
+              inputPadding="0 !important"
+            />
+          </div>
         </div>
 
         {isLoading ? (
@@ -102,6 +183,7 @@ export default function InventoryListForm() {
             data={inventoryList.rpProviderInventories}
             headCells={headCells}
             resetPageSignal={brand?.id}
+            headerGroups={headerGroups}
           />
         ) : (
           <p className="p-6 text-red-400 text-sm md:text-base font-bold">
@@ -109,6 +191,5 @@ export default function InventoryListForm() {
           </p>
         )}
       </Paper>
-    </>
   );
 }

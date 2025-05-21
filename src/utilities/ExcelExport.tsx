@@ -1,8 +1,9 @@
 import * as XLSX from "xlsx";
-import { HeadCell } from "../components/inventory/InventoryListForm";
+
 import ExcelIcon from "../assets/images/GrayThem/excel24.png";
 import Modal from "../components/layout/Modal";
 import { useState, useEffect } from "react";
+import { HeadCell } from "../hooks/useTable";
 
 interface ExportToExcelProps<T> {
   headCells: HeadCell<T>[];
@@ -15,7 +16,6 @@ const ExcelExport = <T extends object>({
 }: ExportToExcelProps<T>) => {
   const fileName = "data_export.xlsx";
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(data);
   useEffect(() => {
     let timeoutId: number;
     if (isModalOpen) {
@@ -36,10 +36,14 @@ const ExcelExport = <T extends object>({
       setIsModalOpen(true);
       return;
     }
-    const exportData = data.map((item) => {
+    const exportData = data.map((item, rowIndex) => {
       const row: Record<string, any> = {};
       headCells.forEach((cell) => {
-        row[cell.label] = (item as any)[cell.id];
+        if (cell.id === "index") {
+          row[cell.label] = rowIndex + 1; // Use rowIndex here!
+        } else {
+          row[cell.label] = (item as any)[cell.id];
+        }
       });
       return row;
     });

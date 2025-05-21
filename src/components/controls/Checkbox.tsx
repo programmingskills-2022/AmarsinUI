@@ -2,7 +2,7 @@ import { FormControl, FormControlLabel, Checkbox as MuiCheckbox } from "@mui/mat
 
 interface CheckboxProps {
   name: string;
-  label: string;
+  label?: string;
   value: boolean;
   onChange: (event: { target: { name: string; value: boolean } }) => void;
 }
@@ -28,7 +28,12 @@ export default function Checkbox(props: CheckboxProps) {
             onChange={(e) => onChange(convertToDefEventPara(name, e.target.checked))}
           />
         }
-        label={label}
+        label={label ?? ""}
+        sx={{
+          "& .MuiFormControlLabel-label": {
+            fontSize: { xs: "0.8rem", md: "1rem" },
+          },
+        }}
       />
     </FormControl>
   );
