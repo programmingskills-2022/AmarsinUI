@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { Paper } from "@mui/material";
 
 import { useBrandStore } from "../../store/brandStore";
-import { useInventoryStore } from "../../store/inventoryStore";
-import { InventoryItem } from "../../types/inventory";
-import { useInventoryGoodList } from "../../hooks/useInventoryGoodList";
 import { useBrand } from "../../hooks/useBrands";
 import Skeleton from "../layout/Skeleton";
 import { useNavigate } from "react-router-dom";
@@ -14,17 +11,22 @@ import { useGeneralContext } from "../../context/GeneralContext";
 import PersianDatePicker from "../controls/PersianDatePicker";
 import Checkbox from "../controls/Checkbox";
 import { HeadCell, HeaderGroup } from "../../hooks/useTable";
+import Modal from "../layout/Modal";
+import { useProviderList } from "../../hooks/useProviderList";
+import { ProviderItem } from "../../types/provider";
+import { useProviderStore } from "../../store/providerStore";
+import { convertPersianDate } from "../../utilities/general";
 
-export const headCells: HeadCell<InventoryItem>[] = [
+export const headCells: HeadCell<ProviderItem>[] = [
   {
     id: "index",
     label: "ردیف",
     disableSorting: true,
   },
-  { id: "fn", label: "نام کالا" },
-  { id: "s", label: "تعداد", isNumber: true },
-  { id: "ns", label: "مبلغ", isNumber: true },
-  { id: "c", label: "تعداد", isNumber: true },
+  { id: "name", label: "نام کالا" },
+  { id: "cnt", label: "تعداد", isNumber: true },
+  { id: "total", label: "مبلغ", isNumber: true, isCurrency: true },
+  { id: "offerCnt", label: "تعداد", isNumber: true },
 ];
 
 const headerGroups: HeaderGroup[] = [
@@ -35,7 +37,8 @@ const headerGroups: HeaderGroup[] = [
 ];
 
 export default function InventoryListForm() {
-  const { inventoryList, error, isLoading } = useInventoryGoodList();
+  const { providerList, error, isLoading } = useProviderList();
+  console.log(providerList.rpProviders);
 
   const { systemId, yearId } = useGeneralContext();
 
@@ -46,16 +49,16 @@ export default function InventoryListForm() {
     id: "0",
     title: "",
   });
-  const [selectedType, setSelectedType] = useState<{
+  const [sanadKind, setSanadKind] = useState<{
     id: string;
     title: string;
   } | null>({
-    id: "0",
+    id: "1",
     title: "",
   });
   const type = [
-    { id: "0", title: "فروش" },
-    { id: "1", title: "برگشت از فروش" },
+    { id: "1", title: "فروش" },
+    { id: "2", title: "برگشت از فروش" },
   ];
 
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -63,9 +66,24 @@ export default function InventoryListForm() {
   const [hasDate, setHasDate] = useState<boolean>(false);
 
   const { setField: setBrandField } = useBrandStore();
-  const { setField } = useInventoryStore();
+  const { setField } = useProviderStore();
   //if error occurred then navigate to login page
   const navigate = useNavigate();
+
+  const { isModalOpen, setIsModalOpen } = useGeneralContext();
+  useEffect(() => {
+    let timeoutId: number;
+    if (isModalOpen) {
+      timeoutId = setTimeout(() => {
+        setIsModalOpen(false);
+      }, 3000);
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isModalOpen]);
 
   const handleDateChange = (event: {
     target: { name: string; value: Date | null };
@@ -73,6 +91,10 @@ export default function InventoryListForm() {
     if (event.target.name === "startDate") {
       setStartDate(event.target.value);
     } else {
+      if (event.target.value && startDate && event.target.value < startDate) {
+        setIsModalOpen(true);
+        return;
+      }
       setEndDate(event.target.value);
     }
   };
@@ -107,8 +129,10 @@ export default function InventoryListForm() {
     setField("accSystem", systemId);
     setField("accYear", yearId);
     setField("brandId", brand === null || !brand ? 0 : brand.id);
-  }, [systemId, yearId, brand?.id]);
-
+    setField("sanadKind", sanadKind?.id);
+    setField("fDate", startDate === null || !startDate ? '' : convertPersianDate(startDate.toLocaleDateString('fa-IR')));
+    setField("tDate", endDate === null || !endDate ? '' : convertPersianDate(endDate.toLocaleDateString('fa-IR')));
+  }, [systemId, yearId, brand?.id, sanadKind?.id, startDate, endDate]);
   if (error) return <div>Error: {error.message} </div>;
 
   return (
@@ -128,7 +152,6 @@ export default function InventoryListForm() {
               value={startDate}
               onChange={handleDateChange}
               disabled={!hasDate}
-
             />
           </div>
           <div className="w-full flex items-center gap-2">
@@ -149,9 +172,9 @@ export default function InventoryListForm() {
             </label>
             <AutoComplete
               options={type}
-              value={selectedType}
+              value={sanadKind}
               handleChange={(_event, newValue) => {
-                return setSelectedType(newValue);
+                return setSanadKind(newValue);
               }}
               setSearch={setSearch}
               showLabel={false}
@@ -181,9 +204,9 @@ export default function InventoryListForm() {
 
       {isLoading ? (
         <div className="text-center">{<Skeleton />}</div>
-      ) : inventoryList.rpProviderInventories.length > 0 ? (
+      ) : providerList.rpProviders.length > 0 ? (
         <Table
-          data={inventoryList.rpProviderInventories}
+          data={providerList.rpProviders}
           headCells={headCells}
           resetPageSignal={brand?.id}
           headerGroups={headerGroups}
@@ -193,6 +216,11 @@ export default function InventoryListForm() {
           هیچ کالایی یافت نشد.
         </p>
       )}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message="تاریخ انتخابی باید بیشتر از تاریخ شروع باشد."
+      />
     </Paper>
   );
 }

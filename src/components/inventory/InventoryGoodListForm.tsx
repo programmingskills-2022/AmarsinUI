@@ -71,7 +71,7 @@ export default function InventoryGoodListForm() {
   return (
     <>
       <Paper className="p-2 m-2 w-full">
-        <div className="flex md:w-1/4 justify-center items-center gap-2">
+        <div className="flex xl:w-1/4 justify-center items-center gap-2">
           <label htmlFor="year" className="">
             برند:
           </label>

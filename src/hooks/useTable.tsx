@@ -25,6 +25,7 @@ export type HeadCell<T> = {
   label: string;
   disableSorting?: boolean;
   isNumber?: boolean;
+  isCurrency?: boolean;
 };
 
 export type HeaderGroup = {
@@ -64,7 +65,6 @@ export default function useTable<T>(
 
   const [page, setPage] = useState<number>(0);
   const {setDefaultRowsPerPage,defaultRowsPerPage,pageNumbers}=useGeneralContext()
-  console.log('defaultRowsPerPage',defaultRowsPerPage)
   const [rowsPerPage, setRowsPerPage] = useState<number>(defaultRowsPerPage);
   const pages = pageNumbers.map((num) => ({
     label: convertToFarsiDigits(num),

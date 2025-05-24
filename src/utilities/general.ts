@@ -39,3 +39,19 @@ export function formatPersianDate(curDay: number, curMonth: number, curYear: num
   
     return convertToFarsiDigits(`${dayName}، ${curDay} ${monthName} ${curYear}`);
   }
+
+  export const convertPersianDate = (dateStr: string): string => {
+    const persianToEnglish = {
+      '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+      '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+    };
+    return dateStr
+      .replace(/[۰-۹]/g, d => persianToEnglish[d as keyof typeof persianToEnglish])
+      .split('/')
+      .map(part => part.padStart(2, '0'))
+      .join('/');
+  };
+
+  export const formatNumberWithCommas = (num: number): string => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };

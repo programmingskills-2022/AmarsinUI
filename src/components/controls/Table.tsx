@@ -1,6 +1,6 @@
 import { TableBody, TableCell, TableRow } from "@mui/material";
 
-import { convertToFarsiDigits } from "../../utilities/general";
+import { convertToFarsiDigits, formatNumberWithCommas } from "../../utilities/general";
 import { useState } from "react";
 import useTable, { HeadCell, HeaderGroup } from "../../hooks/useTable";
 
@@ -52,7 +52,11 @@ export function Table<T>({
                   let displayValue;
                   if (cell.id === "index") {
                     displayValue = page * rowsPerPage + idx + 1; 
-                  } else {
+                  } 
+                  else if(cell.isCurrency){
+                    displayValue = convertToFarsiDigits(formatNumberWithCommas(item[cell.id] as number));
+                  }
+                  else {
                     const value = item[cell.id];
                     displayValue =
                       cell.isNumber && value !== undefined && value !== null
@@ -79,7 +83,10 @@ export function Table<T>({
                   let displayValue;
                   if (cell.id === "index") {
                     displayValue = page * rowsPerPage + idx + 1; 
-                  } else {
+                  } else if(cell.isCurrency){
+                    displayValue = convertToFarsiDigits(formatNumberWithCommas(item[cell.id] as number));
+                  }
+                  else {
                     const value = item[cell.id];
                     displayValue =
                       cell.isNumber && value !== undefined && value !== null

@@ -39,7 +39,6 @@ const SideMenu = () => {
   }, [isMenuOpened]);
 
   const openLogin = () => {
-    console.log(search);
     logout();
   };
 

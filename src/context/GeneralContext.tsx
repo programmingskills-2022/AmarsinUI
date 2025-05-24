@@ -20,6 +20,8 @@ interface GeneralContextProps {
   defaultRowsPerPage: number;
   setDefaultRowsPerPage: (value: number) => void;
   pageNumbers: number[];
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
 }
 
 const GeneralContext = createContext<GeneralContextProps | undefined>(
@@ -51,6 +53,7 @@ export const GeneralProvider: React.FC<{ children: ReactNode }> = ({
   const [defaultRowsPerPage, setDefaultRowsPerPage] = useState<number>(() =>
     getInitial("defaultRowsPerPage", pageNumbers[1])
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("isMenuOpened", JSON.stringify(isMenuOpened));
@@ -90,6 +93,8 @@ export const GeneralProvider: React.FC<{ children: ReactNode }> = ({
         defaultRowsPerPage,
         setDefaultRowsPerPage,
         pageNumbers,
+        isModalOpen,
+        setIsModalOpen,
       }}
     >
       {children}
