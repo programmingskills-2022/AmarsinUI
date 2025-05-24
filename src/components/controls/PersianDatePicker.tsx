@@ -20,7 +20,8 @@ export default function PersianDatePicker({ name, value, onChange, disabled }: D
       locale={persian_fa}
       calendarPosition="bottom-right"
       placeholder="اینجا کلیک کنید..."
-      inputClass={`text-sm md:text-base p-2 border-2 border-gray-300 rounded-md ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+      inputClass={`w-full text-sm md:text-base p-2 border-2 border-gray-300 rounded-md ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+      style={{ width: "100%" }} 
       disabled={disabled}
     />
   );

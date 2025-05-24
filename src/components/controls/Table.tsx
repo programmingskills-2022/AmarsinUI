@@ -31,6 +31,8 @@ export function Table<T>({
     isMobile,
     mobileMainColumns,
     mobileRestColumns,
+    page,           
+    rowsPerPage,    
   } = useTable<T>(
     data,
     headCells,
@@ -49,7 +51,7 @@ export function Table<T>({
                 (cell: HeadCell<T>) => {
                   let displayValue;
                   if (cell.id === "index") {
-                    displayValue = idx + 1; // 1-based row number
+                    displayValue = page * rowsPerPage + idx + 1; 
                   } else {
                     const value = item[cell.id];
                     displayValue =
@@ -76,7 +78,7 @@ export function Table<T>({
                   {mobileRestColumns.map((cell: HeadCell<T>) => {
                   let displayValue;
                   if (cell.id === "index") {
-                    displayValue = idx + 1; // 1-based row number
+                    displayValue = page * rowsPerPage + idx + 1; 
                   } else {
                     const value = item[cell.id];
                     displayValue =

@@ -18,6 +18,7 @@ import {
 } from "@mui/icons-material";
 import { SxProps } from "@mui/system";
 import { convertToFarsiDigits } from "../utilities/general";
+import { useGeneralContext } from "../context/GeneralContext";
 
 export type HeadCell<T> = {
   id: keyof T | "index";
@@ -43,6 +44,8 @@ type UseTableReturn<T> = {
   isMobile: boolean;
   mobileMainColumns: HeadCell<T>[];
   mobileRestColumns: HeadCell<T>[];
+  page:number,          
+  rowsPerPage:number,    
 };
 
 export default function useTable<T>(
@@ -58,9 +61,11 @@ export default function useTable<T>(
   const mobileMainColumns = headCells.slice(0, 3);
   const mobileRestColumns = headCells.slice(3);
 
-  const pageNumbers = [5, 10, 25];
+
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(pageNumbers[1]);
+  const {setDefaultRowsPerPage,defaultRowsPerPage,pageNumbers}=useGeneralContext()
+  console.log('defaultRowsPerPage',defaultRowsPerPage)
+  const [rowsPerPage, setRowsPerPage] = useState<number>(defaultRowsPerPage);
   const pages = pageNumbers.map((num) => ({
     label: convertToFarsiDigits(num),
     value: num,
@@ -146,6 +151,7 @@ export default function useTable<T>(
   // Custom Pagination Actions
   function TablePaginationActions(props: any) {
     const { count, page, rowsPerPage, onPageChange } = props;
+    setDefaultRowsPerPage(rowsPerPage)
     const lastPage = Math.max(0, Math.ceil(count / rowsPerPage) - 1);
 
     return (
@@ -257,5 +263,7 @@ export default function useTable<T>(
     isMobile,
     mobileMainColumns,
     mobileRestColumns,
+    page,
+    rowsPerPage
   };
 }

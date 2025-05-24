@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface GeneralContextProps {
   isMenuOpened: boolean;
@@ -11,27 +17,62 @@ interface GeneralContextProps {
   setSystemId: (value: number) => void;
   chartId: number;
   setChartId: (value: number) => void;
+  defaultRowsPerPage: number;
+  setDefaultRowsPerPage: (value: number) => void;
+  pageNumbers: number[];
 }
 
-const GeneralContext = createContext<GeneralContextProps | undefined>(undefined);
+const GeneralContext = createContext<GeneralContextProps | undefined>(
+  undefined
+);
 
 const getInitial = <T,>(key: string, defaultValue: T): T => {
   const saved = localStorage.getItem(key);
   return saved !== null ? JSON.parse(saved) : defaultValue;
 };
 
-export const GeneralProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isMenuOpened, setIsMenuOpened] = useState<boolean>(() => getInitial("isMenuOpened", true));
-  const [treeNodeTitle, setTreeNodeTitle] = useState<string>(() => getInitial("treeNodeTitle", ""));
+export const GeneralProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const pageNumbers = [5, 10, 25];
+  const [isMenuOpened, setIsMenuOpened] = useState<boolean>(() =>
+    getInitial("isMenuOpened", true)
+  );
+  const [treeNodeTitle, setTreeNodeTitle] = useState<string>(() =>
+    getInitial("treeNodeTitle", "")
+  );
   const [yearId, setYearId] = useState<number>(() => getInitial("yearId", 0));
-  const [systemId, setSystemId] = useState<number>(() => getInitial("systemId", 0));
-  const [chartId, setChartId] = useState<number>(() => getInitial("chartId", 0));
+  const [systemId, setSystemId] = useState<number>(() =>
+    getInitial("systemId", 0)
+  );
+  const [chartId, setChartId] = useState<number>(() =>
+    getInitial("chartId", 0)
+  );
+  const [defaultRowsPerPage, setDefaultRowsPerPage] = useState<number>(() =>
+    getInitial("defaultRowsPerPage", pageNumbers[1])
+  );
 
-  useEffect(() => { localStorage.setItem("isMenuOpened", JSON.stringify(isMenuOpened)); }, [isMenuOpened]);
-  useEffect(() => { localStorage.setItem("treeNodeTitle", JSON.stringify(treeNodeTitle)); }, [treeNodeTitle]);
-  useEffect(() => { localStorage.setItem("yearId", JSON.stringify(yearId)); }, [yearId]);
-  useEffect(() => { localStorage.setItem("systemId", JSON.stringify(systemId)); }, [systemId]);
-  useEffect(() => { localStorage.setItem("chartId", JSON.stringify(chartId)); }, [chartId]);
+  useEffect(() => {
+    localStorage.setItem("isMenuOpened", JSON.stringify(isMenuOpened));
+  }, [isMenuOpened]);
+  useEffect(() => {
+    localStorage.setItem("treeNodeTitle", JSON.stringify(treeNodeTitle));
+  }, [treeNodeTitle]);
+  useEffect(() => {
+    localStorage.setItem("yearId", JSON.stringify(yearId));
+  }, [yearId]);
+  useEffect(() => {
+    localStorage.setItem("systemId", JSON.stringify(systemId));
+  }, [systemId]);
+  useEffect(() => {
+    localStorage.setItem("chartId", JSON.stringify(chartId));
+  }, [chartId]);
+  useEffect(() => {
+    localStorage.setItem(
+      "defaultRowsPerPage",
+      JSON.stringify(defaultRowsPerPage)
+    );
+  }, [defaultRowsPerPage == 0 ? pageNumbers[1] : defaultRowsPerPage]);
 
   return (
     <GeneralContext.Provider
@@ -46,6 +87,9 @@ export const GeneralProvider: React.FC<{ children: ReactNode }> = ({ children })
         setSystemId,
         chartId,
         setChartId,
+        defaultRowsPerPage,
+        setDefaultRowsPerPage,
+        pageNumbers,
       }}
     >
       {children}
