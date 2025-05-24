@@ -2,7 +2,7 @@ import * as XLSX from "xlsx";
 
 import ExcelIcon from "../assets/images/GrayThem/excel24.png";
 import Modal from "../components/layout/Modal";
-import { useState, useEffect } from "react";
+import {  useEffect } from "react";
 import { HeadCell } from "../hooks/useTable";
 import { useGeneralContext } from "../context/GeneralContext";
 
